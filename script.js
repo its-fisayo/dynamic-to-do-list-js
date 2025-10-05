@@ -3,17 +3,14 @@ document.addEventListener("DOMContentLoaded", function() {
     const taskInput = document.getElementById("task-input");
     const taskList = document.getElementById("task-list");
 
-    //define addTask function
-    function addTask() {
-        const taskText = taskInput.value.trim();
+    let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
-        //Check if the input is empty
-        if (taskText === "") {
-            alert("Enter a Task");
-            return;
-        }
-        
-        //Create new list element
+    function saveTasks() {
+        localStorage.setItem("tasks", JSON.stringify(tasks));
+    }
+
+    function createTaskElement(taskText) {
+         //Create new list element
         const task = document.createElement("li");
         task.textContent = taskText;
 
@@ -24,15 +21,39 @@ document.addEventListener("DOMContentLoaded", function() {
 
         button.onclick = function() {
             taskList.removeChild(task);
+
+            tasks = tasks.filter(task => task !== taskText);
+            saveTasks();
         };
 
         //Append button to list item then list item to list
         task.appendChild(button);
         taskList.appendChild(task);
+    }
 
-        //Clear input field
+    function loadTasks() {
+        tasks.forEach(task => createTaskElement(task));
+    }
+
+
+    //define addTask function
+    function addTask() {
+        const taskText = taskInput.value.trim();
+
+        //Check if the input is empty
+        if (taskText === "") {
+            alert("Enter a Task");
+            return;
+        }
+        
+        createTaskElement(taskText);
+
+        tasks.push(taskText);
+        saveTasks();
+
         taskInput.value = "";
     }
+    
 
     //Add event listeners
     addButton.addEventListener("click", addTask);
@@ -42,4 +63,6 @@ document.addEventListener("DOMContentLoaded", function() {
             addTask();
         }
     });
+
+    loadTasks();
 });
